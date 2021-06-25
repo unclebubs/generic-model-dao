@@ -6,5 +6,7 @@
         "javascript",
         "javascriptreact",
     ],
-    "eslint.format.enable": true
+    "eslint.format.enable": true,
+    "editor.quickSuggestions": true,
+    "editor.suggestOnTriggerCharacters": true,
 }
