@@ -1,13 +1,5 @@
-// import configureMockStore from 'redux-mock-store'
-// import thunk from 'redux-thunk'
-// import * as actions from './AssetManagerActions'
-// import * as types from './Types'
-// import testImage from '../test/tester.jpg'
-// const middlewares = [thunk]
-// const mockStore = configureMockStore(middlewares)
 
-
-import {assertFails, initializeTestApp} from '@firebase/rules-unit-testing'
+import {initializeTestApp} from '@firebase/rules-unit-testing'
 import PublishedStatus from '../entity/PublishedStatus'
 import { TestEntity, TestEntityDAO } from './test/TestEntities'
 
