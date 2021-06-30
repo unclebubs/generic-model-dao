@@ -1,7 +1,7 @@
 
 import {initializeTestApp} from '@firebase/rules-unit-testing'
 import PublishedStatus from '../entity/PublishedStatus'
-import ThreeDModel, {IThreeDModel} from '../entity/ThreeDModel'
+import ThreeDModel, {ARPlacment, ARScale, InteractionPrompt, IThreeDModel, Loading, Reveal} from '../entity/ThreeDModel'
 import ThreeDModelDAO from './ThreeDModelDAO'
 
 
@@ -13,7 +13,8 @@ let db
 beforeAll(async () => {
   db = initializeTestApp({ databaseName: 'testdao', auth: {uid: 'craig'} })
   db.database().ref().set(null);
-  testDAO = new ThreeDModelDAO(db, ThreeDModel)
+  testDAO = new ThreeDModelDAO()
+  testDAO.firebase = db
 })
 
 afterAll(() => {
@@ -28,44 +29,44 @@ const testData: IThreeDModel = {
   order: 87,
   planId: 'plan1',
   userId: 'craig',
-  _name: 'name1',
+  name: 'name1',
   description: 'descrption',
-  src: 'src1',
-  iosSrc: 'iossrc1',
-  skyboxImage: 'skyboxImage3',
-  poster: 'poster77',
-  hideFullScreenButton: true,
-  hideColorsButton: true,
-  exposure: 9,
-  shadowIntensity: 999,
-  shadowSoftness: 9999,
-  rotationPerSecond: 99999,
-  autoRotateDelay: 999999,
-  autoRotate: true,
-  cameraControls: true,
-  cameraOrbit: 'cameraOrbit4',
-  cameraTargetX: 9999999,
-  cameraTargetY: 99999999,
-  cameraTargetZ: 11,
-  useYawLimits: true,
-  yawMinLimit: 111,
-  yawMaxLimit: 1111,
-  usePitchLimits: true,
-  pitchMinLimit: 2,
-  pitchMaxLimit: 22,
-  radiusMinLimit: 222,
-  radiusMaxLimit: 2222,
-  minFieldOfView: 3,
-  maxFieldOfView: 33,
-  fieldOfView: 333,
-  ar: true,
-  arScale: 'arScale.3',
-  arPlacement: 'arPlacement2',
-  buttonColor: 'buttonColor4',
-  loading: 'loading3',
-  reveal: 'reveal4',
-  interactionPrompt: 'interactionPrompt1',
-  buttonStates: {
+  _src: 'src1',
+  _iosSrc: 'iossrc1',
+  _skyboxImage: 'skyboxImage3',
+  _poster: 'poster77',
+  _hideFullScreenButton: true,
+  _hideColorsButton: true,
+  _exposure: 9,
+  _shadowIntensity: 999,
+  _shadowSoftness: 9999,
+  _rotationPerSecond: 99999,
+  _autoRotateDelay: 999999,
+  _autoRotate: true,
+  _cameraControls: true,
+  _cameraOrbit: 'cameraOrbit4',
+  _cameraTargetX: 9999999,
+  _cameraTargetY: 99999999,
+  _cameraTargetZ: 11,
+  _useYawLimits: true,
+  _yawMinLimit: 111,
+  _yawMaxLimit: 1111,
+  _usePitchLimits: true,
+  _pitchMinLimit: 2,
+  _pitchMaxLimit: 22,
+  _radiusMinLimit: 222,
+  _radiusMaxLimit: 2222,
+  _minFieldOfView: 3,
+  _maxFieldOfView: 33,
+  _fieldOfView: 333,
+  _ar: true,
+  _arScale: ARScale.FIXED,
+  _arPlacement: ARPlacment.WALL,
+  _buttonColor: 'buttonColor4',
+  _loading: Loading.EAGER,
+  _reveal: Reveal.INTERACTION,
+  _interactionPrompt: InteractionPrompt.NONE,
+  _buttonStates: {
     deleteButtonState: 'buttonStates',
     publishHotSpotButtonState: 'buttonStates2',
     publishButtonState: 'buttonStates3',

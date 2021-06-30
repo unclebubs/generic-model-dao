@@ -16,8 +16,9 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
      this.type = type
    }
 
+
    
-   loadEntities = async ({ params, published = false, dispatch, dispatchEntitiesLoaded, dispatchEntityAdded, dispatchEntityUpdated, dispatchEntityRemoved }) => {
+   loadEntities = async ({ params, published = false, dispatch, dispatchEntitiesLoaded, dispatchEntityAdded, dispatchEntityUpdated, dispatchEntityRemoved }: any) => {
      const ref = this.getAllEntitiesRef(params)
      const requiredRef = ref + (published ? '/published' : '/pending')
      try {
@@ -72,7 +73,7 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
     
 
 
-    saveEntity = async (entity: E): Promise<E> => {
+    saveEntity = async (entity: E ): Promise<E> => {
       const ref: string = this.getNewEntityRef(entity)
       const unPublishedRef = this.getRequiredRef(ref, false)
       return new Promise(async (resolve, reject) => {

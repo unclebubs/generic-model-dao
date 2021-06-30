@@ -1,17 +1,18 @@
 import PublishedStatus from '../entity/PublishedStatus'
-import ThreeDModel, { IThreeDModel, modelDefaults } from './ThreeDModel'
+import ThreeDModel, { ARPlacment, ARScale, InteractionPrompt, IThreeDModel, Loading, modelDefaults, Reveal } from './ThreeDModel'
+import {createModelViewerProps} from './ThreeDModelScripts'
 
 const data: IThreeDModel = {
-  _id: 'id1',
-  _status: PublishedStatus.PUBLISHED,
-  _order: 87,
-  _planId: 'plan1',
-  _userId: 'user1',
-  _name: 'name1',
-  _description: 'descrption',
+  id: 'id1',
+  status: PublishedStatus.PUBLISHED,
+  order: 87,
+  planId: 'plan1',
+  userId: 'user1',
+  name: 'name1',
+  description: 'descrption',
   _src: 'src1',
   _iosSrc: 'iossrc1',
-  _poster: null,
+  _poster: 'pp',
   _skyboxImage: 'skyboxImage3',
   _hideFullScreenButton: true,
   _hideColorsButton: true,
@@ -38,12 +39,12 @@ const data: IThreeDModel = {
   _maxFieldOfView: 33,
   _fieldOfView: 333,
   _ar: true,
-  _arScale: 'arScale.3',
-  _arPlacement: 'arPlacement2',
+  _arScale: ARScale.FIXED,
+  _arPlacement: ARPlacment.FLOOR,
   _buttonColor: 'buttonColor4',
-  _loading: 'loading3',
-  _reveal: 'reveal4',
-  _interactionPrompt: 'interactionPrompt1',
+  _loading: Loading.AUTO,
+  _reveal: Reveal.AUTO,
+  _interactionPrompt: InteractionPrompt.NONE,
   _buttonStates: {
     deleteButtonState: 'buttonStates',
     publishHotSpotButtonState: 'buttonStates2',
@@ -72,7 +73,133 @@ it('Test ThreeDModel autorotate functionality', () => {
 it('Test ThreeDModel Creation', () => {
   const entity: ThreeDModel = new ThreeDModel(data)
   for (const key in entity) {
-    console.log('checking ', key)
     expect(entity[key]).toBe(data[key])
   }
+})
+
+it('Test camera-controls and ar Props ', () => {
+  const entity: ThreeDModel = new ThreeDModel(data)
+  entity.ar = false
+  entity.cameraControls = false
+  const props = createModelViewerProps(entity)
+  expect(props['camera-controls']).toBeFalsy()
+  expect(props['ar']).toBeFalsy()
+  expect(props['ar-scale']).toBeFalsy()
+  expect(props['ar-placement']).toBeFalsy()
+  entity.ar = true
+  entity.arPlacement = ARPlacment.WALL
+  entity.arScale = ARScale.FIXED
+  entity.cameraControls = true
+  const props2 = createModelViewerProps(entity)
+  console.log('props ', props2)
+  expect(props2['camera-controls']).toBe('')
+  expect(props2['ar']).toBe('')
+  expect(props2['ar-scale']).toBe(entity.arScale)
+  expect(props2['ar-placement']).toBe(entity.arPlacement)
+})
+
+it('Test autorotate Props ', () => {
+  const entity: ThreeDModel = new ThreeDModel(data)
+  const props2 = createModelViewerProps(entity)
+
+  expect(props2['auto-rotate']).toBeTruthy()
+  expect(props2['rotation-per-second']).toBe(entity.rotationPerSecond +'deg')
+  expect(props2['auto-rotate-delay']).toBe(entity.autoRotateDelay)
+
+  entity.autoRotate = false
+  const props = createModelViewerProps(entity)
+  expect(props['auto-rotate']).toBeNull()
+  expect(props['rotation-per-second']).toBeNull()
+  expect(props['auto-rotate-delay']).toBeNull()
+
+  
+})
+
+it('Test use-yaw-limits Props ', () => {
+  const entity: ThreeDModel = new ThreeDModel(data)
+  entity.useYawLimits = true
+  entity.usePitchLimits = true
+  entity.yawMinLimit = 45
+  entity.radiusMinLimit = 32
+  entity.pitchMinLimit = 2
+  entity.yawMaxLimit = 45
+  entity.radiusMaxLimit = 32
+  entity.pitchMaxLimit = 2
+  const props2 = createModelViewerProps(entity)
+
+  expect(props2['min-camera-orbit']).toBe(`${entity.yawMinLimit}deg ${entity.pitchMinLimit}deg ${entity.radiusMinLimit}m`)
+  expect(props2['max-camera-orbit']).toBe(`${entity.yawMaxLimit}deg ${entity.pitchMaxLimit}deg ${entity.radiusMaxLimit}m`)
+
+  entity.useYawLimits = false
+  entity.usePitchLimits = false
+  entity.radiusMinLimit = null
+  entity.radiusMaxLimit = null
+  const props = createModelViewerProps(entity)
+  expect(props['min-camera-orbit']).toBeFalsy()
+  expect(props['max-camera-orbit']).toBeFalsy()
+})
+
+it('Test camera-target props ', () => {
+  const entity: ThreeDModel = new ThreeDModel(data)
+  entity.cameraTargetX = 0
+  entity.cameraTargetY = 0
+  entity.cameraTargetZ = 0
+  const props = createModelViewerProps(entity)
+  expect(props['camera-target']).toBeUndefined()
+  entity.cameraTargetX = 1
+  entity.cameraTargetY = 0
+  entity.cameraTargetZ = 0
+  const props2 = createModelViewerProps(entity)
+  expect(props2['camera-target']).toBe('1m 0m 0m')
+  entity.cameraTargetX = 1
+  entity.cameraTargetY = 1
+  entity.cameraTargetZ = 1
+  const props3 = createModelViewerProps(entity)
+  expect(props3['camera-target']).toBe('1m 1m 1m')
+
+
+})
+
+it('Test loading Creation', () => {
+  const entity: ThreeDModel = new ThreeDModel(data)
+  entity.loading = Loading.AUTO
+  const props = createModelViewerProps(entity)
+  expect(props['loading']).toBeFalsy()
+  entity.loading = Loading.EAGER
+  const props2 = createModelViewerProps(entity)
+  expect(props2['loading']).toBe(Loading.EAGER)
+
+})
+
+it('Test no id, status, order in model viewer props', () => {
+  const entity: ThreeDModel = new ThreeDModel(data)
+  const props = createModelViewerProps(entity)
+  expect(props['id']).toBeFalsy()
+  
+
+})
+
+it('Test reveal Creation', () => {
+  const entity: ThreeDModel = new ThreeDModel(data)
+  entity.reveal = Reveal.AUTO
+  const props = createModelViewerProps(entity)
+  expect(props['reveal']).toBeFalsy()
+  entity.reveal = Reveal.MANUAL
+  const props2 = createModelViewerProps(entity)
+  expect(props2['reveal']).toBe(Reveal.MANUAL)
+
+})
+
+
+it('Test interactionPrompt Creation', () => {
+  const entity: ThreeDModel = new ThreeDModel(data)
+  entity.interactionPrompt = InteractionPrompt.AUTO
+  const props = createModelViewerProps(entity)
+  expect(props['interaction_prompt']).toBeFalsy()
+  entity.interactionPrompt = InteractionPrompt.NONE
+  entity.autoRotate = false
+  const props2 = createModelViewerProps(entity)
+  console.log('props2', props2['interaction-prompt'])
+  // expect(props2['interaction_prompt']).toBe('InteractionPrompt.NONE')
+
 })

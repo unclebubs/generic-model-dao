@@ -5,27 +5,23 @@ export enum PublishedStatus {
 }
 
 export interface EntityInterface {
-  _id?: string | null,
-  _status?: PublishedStatus,
-  _order?: number,
-  _userId: string
+  id?: string | null;
+  status?: PublishedStatus;
+  order?: number;
+  userId: string;
 }
 
-
 export abstract class Entity implements EntityInterface {
-  _id = null
-  _status = PublishedStatus.UNPUBLISHED
-  _order = -1
-  _userId = '-1'
+  id = null
+  status = PublishedStatus.UNPUBLISHED
+  order = -1
+  userId = '-1'
 
-  constructor(params: EntityInterface) {
-    Object.keys(this).forEach(key => {
+  constructor (params: EntityInterface) {
+    Object.keys(this).forEach((key: string) => {
       if (params[key]) {
-        this[key] = params[key]
+        this[key as keyof this] = params[key]
       }
     })
   }
-
-
 }
-
