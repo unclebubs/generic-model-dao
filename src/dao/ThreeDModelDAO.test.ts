@@ -6,9 +6,8 @@ import ThreeDModelDAO from './ThreeDModelDAO'
 
 
 
-let testDAO
+let testDAO : ThreeDModelDAO
 let db
-
  
 beforeAll(async () => {
   db = initializeTestApp({ databaseName: 'testdao', auth: {uid: 'craig'} })
@@ -17,7 +16,7 @@ beforeAll(async () => {
   testDAO.firebase = db
 })
 
-afterAll(() => {
+afterEach(() => {
   db.database().ref().set(null);
 })
 
@@ -26,6 +25,7 @@ afterAll(() => {
 const testData: IThreeDModel = {
   id: 'id1',
   status: PublishedStatus.UNPUBLISHED,
+  referenceId: '',
   order: 87,
   planId: 'plan1',
   userId: 'craig',
@@ -66,7 +66,7 @@ const testData: IThreeDModel = {
   _loading: Loading.EAGER,
   _reveal: Reveal.INTERACTION,
   _interactionPrompt: InteractionPrompt.NONE,
-  _buttonStates: {
+  buttonStates: {
     deleteButtonState: 'buttonStates',
     publishHotSpotButtonState: 'buttonStates2',
     publishButtonState: 'buttonStates3',
@@ -75,11 +75,35 @@ const testData: IThreeDModel = {
   },
 }
 
+it('Test loadEntityFromReferenceID method', async () => {
+  const entity = new ThreeDModel(testData)
+  const savedEntity = await testDAO.saveEntity(entity)
+  const loadedEntity = await testDAO.loadEntityFromReferenceID(savedEntity.referenceId, false)
+  expect(loadedEntity.id).toBe(savedEntity.id)
+
+  const loadedEntity2 = await testDAO.loadEntity({uid: savedEntity.userId, planId: savedEntity.planId, id:savedEntity.id}, false)
+  expect(loadedEntity2.id).toBe(savedEntity.id)
+})
+
+it('Test get reference methods', async () => {
+  const entity = new ThreeDModel(testData)
+  const savedEntity = await testDAO.saveEntity(entity)
+  const expectedRef = `${testDAO.path}/${savedEntity.userId}/${savedEntity.planId}/${savedEntity.id}`
+  expect(testDAO.getRefFromEntity(savedEntity)).toBe(expectedRef)
+  expect(testDAO.getRefFromParams({uid: savedEntity.userId ,planId: savedEntity.planId , id:savedEntity.id})).toBe(expectedRef)
+  expect(testDAO.getNewEntityRef(new ThreeDModel(testData))).toBe(`${testDAO.path}/${savedEntity.userId}/${savedEntity.planId}/`)
+  expect(testDAO.getAllEntitiesRef({uid: savedEntity.userId ,planId: savedEntity.planId})).toBe(`${testDAO.path}/${savedEntity.userId}/${savedEntity.planId}`)
+  expect(await testDAO.getRefFromReferenceId(savedEntity.referenceId)).toBe(expectedRef)
+})
+
 it('Test saving of new Entity', async () => {
   const testEntity = new ThreeDModel(testData)
-  const savedEntity = await testDAO.saveEntity(testEntity, ThreeDModel)
+  const savedEntity = await testDAO.saveEntity(testEntity)
   for (const key in savedEntity) {
     if (key === 'id') {
+      expect(savedEntity[key]).not.toBe(testData[key])
+      expect(savedEntity).not.toBeNull()
+    } else  if (key === 'referenceId') {
       expect(savedEntity[key]).not.toBe(testData[key])
       expect(savedEntity).not.toBeNull()
     } else {
@@ -91,8 +115,9 @@ it('Test saving of new Entity', async () => {
 
 it('Test loading all entities', async () => {
   const testEntity = new ThreeDModel(testData)
-  await testDAO.saveEntity(testEntity, ThreeDModel)
-  await testDAO.saveEntity(testEntity, ThreeDModel)
+  await testDAO.saveEntity(testEntity)
+  await testDAO.saveEntity(testEntity)
+  await testDAO.saveEntity(testEntity)
   const savedEntities = await testDAO.loadAllEntities({uid: 'craig', planId: 'plan1'}, false)
   savedEntities.forEach(element => {
     expect(element instanceof ThreeDModel).toBe(true)

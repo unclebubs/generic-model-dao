@@ -10,6 +10,7 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
    firebase: any = null
    type: any = null
    abstract  path: string
+   abstract idTable: string
 
    constructor(fbase: any, type: {new (params: any) : E}) {
      this.firebase = fbase
@@ -72,7 +73,6 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
    }
     
 
-
     saveEntity = async (entity: E ): Promise<E> => {
       const ref: string = this.getNewEntityRef(entity)
       const unPublishedRef = this.getRequiredRef(ref, false)
@@ -84,6 +84,9 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
           const entityRef = pathRef.push()
           entity.id = entityRef.key
           entity.status = PublishedStatus.UNPUBLISHED
+          //create a new referenceId
+          const referenceId = await this.createNewReferenceId(`${ref}${entity.id}`)
+          entity.referenceId = referenceId
           // entity.buttonStates = null
           await entityRef.set(entity)
           resolve(entity)
@@ -92,6 +95,16 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
           reject(error)
         }
       })
+    }
+
+    createNewReferenceId = async (ref: string) => {
+      if (this.idTable) {
+        const idPathRef = this.firebase.database().ref(this.idTable)
+        const idRef = idPathRef.push()
+        await idRef.set({ref: ref})
+        return idRef.key
+      }
+      return ''
     }
 
     async updateEntity (entity: E) : Promise<E> {
@@ -117,6 +130,13 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
           reject(error)
         }
       })
+    }
+
+    loadEntityFromReferenceID = async(referenceId : string,  published: boolean): Promise<E> => {
+      const ref: string =  await this.getRefFromReferenceId(referenceId)
+      const requiredRef: string = this.getRequiredRef(ref, published)
+      const snapshot = await  this.firebase.database().ref(requiredRef) .once('value')
+      return new this.type(snapshot.val())    
     }
 
    loadEntity = async(params : any,  published: boolean): Promise<E> => {
@@ -270,4 +290,11 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
   abstract getNewEntityRef(entity: E) : string
 
   abstract getAllEntitiesRef(params: any) : string
+
+  getRefFromReferenceId = async (refId: string): Promise<string> => {
+    const ref = `${this.idTable}/${refId}`
+    const snapshot = await this.firebase.database().ref(ref).once('value')
+    const reference = snapshot.val().ref 
+    return reference
+  }
 }

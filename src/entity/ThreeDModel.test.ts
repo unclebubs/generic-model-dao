@@ -8,6 +8,7 @@ const data: IThreeDModel = {
   order: 87,
   planId: 'plan1',
   userId: 'user1',
+  referenceId: 'testRef',
   name: 'name1',
   description: 'descrption',
   _src: 'src1',
@@ -45,7 +46,7 @@ const data: IThreeDModel = {
   _loading: Loading.AUTO,
   _reveal: Reveal.AUTO,
   _interactionPrompt: InteractionPrompt.NONE,
-  _buttonStates: {
+  buttonStates: {
     deleteButtonState: 'buttonStates',
     publishHotSpotButtonState: 'buttonStates2',
     publishButtonState: 'buttonStates3',

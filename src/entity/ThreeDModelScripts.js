@@ -1,4 +1,4 @@
-import ThreeDModel, {modelDefaults} from './ThreeDModel'
+import {modelDefaults} from './ThreeDModel'
 
  const camelCaseToDash = (str) => {
   return str.replace(/([a-zA-Z])(?=[A-Z])/g, '$1-').toLowerCase()
@@ -15,7 +15,9 @@ const covertCamelCaseObjectToDash = (obj) => {
 
 const extractModelViewerProps = (allProperties) => {
   const {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     id, userId, planId, productId, subscriptionId, name, description,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     order, status, buttonStates, buttonColor, hideFullScreenButton,
     ...requiredModelViewerProps
   } = allProperties
@@ -102,6 +104,7 @@ const removeUnderScore = (props) => {
   return newObj
 }
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 export const createModelViewerProps = (allProperties) => {
   // remove unnessecary props
   

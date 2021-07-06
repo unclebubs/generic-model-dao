@@ -30,9 +30,6 @@ export enum InteractionPrompt {
 }
 
 export interface IThreeDModel extends EntityInterface {
-  planId: string,
-  name: string,
-  description: string,
   _src?: string | null,
   _iosSrc?: string | null,
   _skyboxImage?: string | null,
@@ -68,7 +65,7 @@ export interface IThreeDModel extends EntityInterface {
   _loading?: Loading,
   _reveal?: Reveal,
   _interactionPrompt?: InteractionPrompt,
-  _buttonStates?: {
+  buttonStates?: {
     deleteButtonState: string,
     publishHotSpotButtonState: string,
     publishButtonState: string,
@@ -78,9 +75,6 @@ export interface IThreeDModel extends EntityInterface {
 }
 
 class ThreeDModel extends Entity implements IThreeDModel {
-  planId = ''
-  name = ''
-  description = ''
   _src = ''
   _iosSrc = ''
   _skyboxImage = ''
@@ -116,37 +110,13 @@ class ThreeDModel extends Entity implements IThreeDModel {
   _loading = Loading.AUTO
   _reveal = Reveal.AUTO
   _interactionPrompt = InteractionPrompt.AUTO
-  _buttonStates = {
+  buttonStates = {
     deleteButtonState: READY,
     publishHotSpotButtonState: READY,
     publishButtonState: READY,
     unPublishButtonState: READY,
     revertChangesButtonState: READY,
   }
-
-  // public get planId (): string {
-  //   return this._planId
-  // }
-
-  // public set planId (value: string) {
-  //   this._planId = value
-  // }
-
-  // public get name (): string {
-  //   return this._name
-  // }
-
-  // public set name (value: string) {
-  //   this._name = value
-  // }
-
-  // public get description (): string {
-  //   return this._description
-  // }
-
-  // public set description (value: string) {
-  //   this._description = value
-  // }
 
   public get src (): string {
     return this._src
@@ -447,14 +417,14 @@ class ThreeDModel extends Entity implements IThreeDModel {
     this._interactionPrompt = value
   }
 
-  public get buttonStates (): any {
-    return this._buttonStates
-  }
+  // public get buttonStates (): any {
+  //   return this._buttonStates
+  // }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-  public set buttonStates (value: any) {
-    this._buttonStates = value
-  }
+  // // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  // public set buttonStates (value: any) {
+  //   this._buttonStates = value
+  // }
 
   constructor (params: IThreeDModel) {
     super(params)

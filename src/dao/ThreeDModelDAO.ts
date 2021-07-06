@@ -5,11 +5,12 @@ import AbstractFirebaseDAO from './AbstractFirebaseDAO'
 
 export default class ThreeDModelDAO extends AbstractFirebaseDAO<ThreeDModel> {
   path = 'threeDModels'
-  
+  idTable = 'model'
 
   constructor () {
     super(fbase, ThreeDModel)
   }
+
 
   getRefFromEntity = (entity: ThreeDModel): string => {
     return `${this.path}/${entity.userId}/${entity.planId}/${entity.id}`

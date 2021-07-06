@@ -6,6 +6,10 @@ export enum PublishedStatus {
 
 export interface EntityInterface {
   id?: string | null;
+  referenceId?: string | null
+  planId: string,
+  name: string,
+  description: string,
   status?: PublishedStatus;
   order?: number;
   userId: string;
@@ -13,6 +17,10 @@ export interface EntityInterface {
 
 export abstract class Entity implements EntityInterface {
   id = null
+  referenceId = ''
+  planId = ''
+  name = ''
+  description = ''
   status = PublishedStatus.UNPUBLISHED
   order = -1
   userId = '-1'
