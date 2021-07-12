@@ -25,7 +25,8 @@ export abstract class Entity implements EntityInterface {
   order = -1
   userId = '-1'
 
-  constructor (params: EntityInterface) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  constructor (params: any) {
     Object.keys(this).forEach((key: string) => {
       if (params[key]) {
         this[key as keyof this] = params[key]

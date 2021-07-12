@@ -5,7 +5,7 @@ import AbstractFirebaseDAO from './AbstractFirebaseDAO'
 
 export default class ThreeDModelDAO extends AbstractFirebaseDAO<ThreeDModel> {
   path = 'threeDModels'
-  idTable = 'model'
+  idTable = 'models'
 
   constructor () {
     super(fbase, ThreeDModel)

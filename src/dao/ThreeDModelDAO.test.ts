@@ -75,6 +75,8 @@ const testData: IThreeDModel = {
   },
 }
 
+
+
 it('Test loadEntityFromReferenceID method', async () => {
   const entity = new ThreeDModel(testData)
   const savedEntity = await testDAO.saveEntity(entity)
@@ -161,12 +163,15 @@ it('Test reverting an entity', async () => {
 
 it('Test deleteing an entity', async () => {
   const entity = new ThreeDModel(testData)
+  entity.name= 'Teste delete entity'
   const savedEntity = await testDAO.saveEntity(entity)
   await testDAO.publishEntity(savedEntity)
   await testDAO.deleteEntity(savedEntity)
 
   const unPublishedEntity = await testDAO.loadEntity({uid: 'craig', id: savedEntity.id}, false)
   const publishedEntity = await testDAO.loadEntity({uid: 'craig', id: savedEntity.id}, true)
+  const ref = await testDAO.getRefFromReferenceId(savedEntity.referenceId)
+  expect(ref).toBe('')
   expect(unPublishedEntity).toBeNull()
   expect(publishedEntity).toBeNull()    
 })

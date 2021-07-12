@@ -5,3 +5,10 @@ WARNING: Use --illegal-access=warn to enable warnings of further illegal reflect
 WARNING: All illegal access operations will be denied in a future release
 10:17:27.816 [NamespaceSystem-akka.actor.default-dispatcher-5] INFO akka.event.slf4j.Slf4jLogger - Slf4jLogger started
 10:17:27.999 [main] INFO com.firebase.server.forge.App$ - Listening at localhost:9000
+13:47:27.505 [Thread-0] INFO com.firebase.server.forge.App$ - Attempting graceful shutdown.
+13:47:27.512 [NamespaceSystem-akka.actor.default-dispatcher-62] INFO com.firebase.core.namespace.Terminator$Terminator - 2 actors left to terminate: testdao, virtualtour-e847f
+13:47:27.517 [NamespaceSystem-akka.actor.default-dispatcher-62] INFO com.firebase.core.namespace.NamespaceActor - Stopping namespace actor for testdao
+13:47:27.517 [NamespaceSystem-akka.actor.default-dispatcher-69] INFO com.firebase.core.namespace.NamespaceActor - Stopping namespace actor for virtualtour-e847f
+13:47:27.518 [NamespaceSystem-akka.actor.default-dispatcher-62] INFO com.firebase.core.namespace.NamespaceActor - Gauges removed for testdao
+13:47:27.518 [NamespaceSystem-akka.actor.default-dispatcher-69] INFO com.firebase.core.namespace.NamespaceActor - Gauges removed for virtualtour-e847f
+13:47:27.522 [Thread-0] INFO com.firebase.server.forge.App$ - Graceful shutdown complete.

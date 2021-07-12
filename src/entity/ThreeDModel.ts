@@ -426,7 +426,8 @@ class ThreeDModel extends Entity implements IThreeDModel {
   //   this._buttonStates = value
   // }
 
-  constructor (params: IThreeDModel) {
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  constructor (params: any) {
     super(params)
     Object.keys(this).forEach((key) => {
       if (params[key]) {

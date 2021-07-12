@@ -1,24 +1,21 @@
+/* eslint-disable new-cap */
 /* eslint-disable no-async-promise-executor */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 // import firebase from './firebase'
 import PublishedStatus from '../entity/PublishedStatus'
 import { Entity } from '../entity/Entity'
 
-
-
 export default abstract class AbstractFirebaseDAO<E extends Entity> {
    firebase: any = null
    type: any = null
-   abstract  path: string
+   abstract path: string
    abstract idTable: string
 
-   constructor(fbase: any, type: {new (params: any) : E}) {
+   constructor (fbase: any, type: {new (params: any) : E}) {
      this.firebase = fbase
      this.type = type
    }
 
-
-   
    loadEntities = async ({ params, published = false, dispatch, dispatchEntitiesLoaded, dispatchEntityAdded, dispatchEntityUpdated, dispatchEntityRemoved }: any) => {
      const ref = this.getAllEntitiesRef(params)
      const requiredRef = ref + (published ? '/published' : '/pending')
@@ -27,10 +24,10 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
          .database()
          .ref(requiredRef)
          .orderByChild('order')
-         .on('value', (snapshot) => {
+         .on('value', (snapshot: any) => {
            // console.log('got value ', snapshot.val())
            const entities: any = snapshot.val() ? Object.values(snapshot.val()) : []
-           const typedEntities: E[] = entities.map(entity => new this.type(entity))
+           const typedEntities: E[] = entities.map((entity: E) => new this.type(entity))
            dispatchEntitiesLoaded(dispatch, typedEntities)
          })
 
@@ -38,14 +35,14 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
          .database()
          .ref(requiredRef)
          .orderByChild('order')
-         .on('child_added', (snapshot, previousKey) => {
+         .on('child_added', (snapshot: any, previousKey: string) => {
            dispatchEntityAdded(dispatch, new this.type(snapshot.val()), previousKey)
          })
        this.firebase
          .database()
          .ref(requiredRef)
          .orderByChild('order')
-         .on('child_changed', (snapshot, previousKey) => {
+         .on('child_changed', (snapshot: any, previousKey: string) => {
            // console.log('child_changed', snapshot.val())
            dispatchEntityUpdated(dispatch, new this.type(snapshot.val()), previousKey)
          })
@@ -53,7 +50,7 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
          .database()
          .ref(requiredRef)
          .orderByChild('order')
-         .on('child_removed', snapshot => {
+         .on('child_removed', (snapshot: any) => {
            // console.log('child_removed', snapshot.val())
            dispatchEntityRemoved(dispatch, new this.type(snapshot.val()))
          })
@@ -61,7 +58,7 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
          .database()
          .ref(requiredRef)
          .orderByChild('order')
-         .on('child_moved', (snapshot, previousKey) => {
+         .on('child_moved', (snapshot: any, previousKey: string) => {
            // console.log('child_moved', snapshot.val())
            dispatchEntityUpdated(dispatch, new this.type(snapshot.val()), previousKey)
          })
@@ -71,20 +68,19 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
        return error
      }
    }
-    
 
-    saveEntity = async (entity: E ): Promise<E> => {
+    saveEntity = async (entity: E): Promise<E> => {
       const ref: string = this.getNewEntityRef(entity)
       const unPublishedRef = this.getRequiredRef(ref, false)
       return new Promise(async (resolve, reject) => {
         try {
-          const pathRef =  this.firebase
+          const pathRef = this.firebase
             .database()
             .ref(unPublishedRef)
           const entityRef = pathRef.push()
           entity.id = entityRef.key
           entity.status = PublishedStatus.UNPUBLISHED
-          //create a new referenceId
+          // create a new referenceId
           const referenceId = await this.createNewReferenceId(`${ref}${entity.id}`)
           entity.referenceId = referenceId
           // entity.buttonStates = null
@@ -97,11 +93,18 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
       })
     }
 
+    saveOrUpdateEntity = async (entity: E): Promise<E> => {
+      if (entity.id) {
+        return await this.updateEntity(entity)
+      }
+      return await this.saveEntity(entity)
+    }
+
     createNewReferenceId = async (ref: string) => {
       if (this.idTable) {
         const idPathRef = this.firebase.database().ref(this.idTable)
         const idRef = idPathRef.push()
-        await idRef.set({ref: ref})
+        await idRef.set({ ref: ref })
         return idRef.key
       }
       return ''
@@ -117,12 +120,10 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
           // entity.buttonStates = null
           await this.firebase.database().ref(unPublishedRef).update(entity)
           // update the status in the published node to pending if mode exists
-          await this.firebase.database().ref(publishedRef).once('value', async (snapshot) => {
+          await this.firebase.database().ref(publishedRef).once('value', async (snapshot: any) => {
             if (snapshot.exists()) {
               await this.firebase.database().ref(publishedRef).update({ status: PublishedStatus.PENDING })
-            } else {
-              throw new Error('Entity not in db')
-            }
+            } 
           })
           resolve(entity)
         } catch (error) {
@@ -132,15 +133,15 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
       })
     }
 
-    loadEntityFromReferenceID = async(referenceId : string,  published: boolean): Promise<E> => {
-      const ref: string =  await this.getRefFromReferenceId(referenceId)
+    loadEntityFromReferenceID = async (referenceId : string, published: boolean): Promise<E> => {
+      const ref: string  = await this.getRefFromReferenceId(referenceId)
       const requiredRef: string = this.getRequiredRef(ref, published)
-      const snapshot = await  this.firebase.database().ref(requiredRef) .once('value')
-      return new this.type(snapshot.val())    
+      const snapshot = await this.firebase.database().ref(requiredRef).once('value')
+      return new this.type(snapshot.val())
     }
 
-   loadEntity = async(params : any,  published: boolean): Promise<E> => {
-     const ref: string =  this.getRefFromParams(params)
+   loadEntity = async (params : any, published: boolean): Promise<E> => {
+     const ref: string = this.getRefFromParams(params)
      const requiredRef: string = this.getRequiredRef(ref, published)
      return new Promise(async (resolve, reject) => {
        try {
@@ -148,7 +149,7 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
            .database()
            .ref(requiredRef)
            .once('value')
-           .then(snapshot => {
+           .then((snapshot: any) => {
              resolve(snapshot.val())
            })
        } catch (error) {
@@ -156,7 +157,6 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
          reject(error)
        }
      })
-
    }
 
    //    const instatiate<E extends Entity>(type: { new(): E ;}, data: EntityInterface ): E  => {
@@ -165,15 +165,14 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
 
    loadAllEntities = async (params: any, published = true) => {
      try {
-       const ref: string =  this.getAllEntitiesRef(params)
-       const requiredRef = ref + (published ? '/published' : '/pending')   
-       const snapshot = await  this.firebase.database().ref(requiredRef).once('value')
+       const ref: string = this.getAllEntitiesRef(params)
+       const requiredRef = ref + (published ? '/published' : '/pending')
+       const snapshot = await this.firebase.database().ref(requiredRef).once('value')
        const data: any = Object.values(snapshot.val())
-       const typedObjects: E = data.map(o => new this.type(o))
+       const typedObjects: E = data.map((o: E) => new this.type(o))
        return Object.values(typedObjects)
 
        //  throw new Error('Nothing found')
-      
      } catch (error) {
        console.log('Error in loadAllEntities', error)
        return error
@@ -241,14 +240,11 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
          const publishedRef = this.getRequiredRef(ref, true)
          // ensure ref doesn't end in published || pending
          if (!unPublishedRef.endsWith('pending/') && !publishedRef.endsWith('published/')) {
-           
-           
            await this.firebase.database().ref(unPublishedRef).remove()
            await this.firebase.database().ref(publishedRef).remove()
+           await this.firebase.database().ref(`${this.idTable}/${entity.referenceId}`).remove()
            return true
-
          }
-
        } catch (error) {
          console.log('Error in deleteEntity', error)
          return error
@@ -257,10 +253,7 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
        return false
      }
 
-
-  
-
-   getPendingRef = (ref: string ) : string => {
+   getPendingRef = (ref: string) : string => {
      return ref.substring(0, ref.lastIndexOf('/')) + '/pending' + ref.substring(ref.lastIndexOf('/'))
    }
 
@@ -283,7 +276,7 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
     }
   }
 
-  abstract getRefFromEntity(entity:  E) : string;
+  abstract getRefFromEntity(entity: E) : string;
 
   abstract getRefFromParams(params: any) : string
 
@@ -294,7 +287,10 @@ export default abstract class AbstractFirebaseDAO<E extends Entity> {
   getRefFromReferenceId = async (refId: string): Promise<string> => {
     const ref = `${this.idTable}/${refId}`
     const snapshot = await this.firebase.database().ref(ref).once('value')
-    const reference = snapshot.val().ref 
-    return reference
+    if (snapshot.val()) {
+      const reference = snapshot.val().ref
+      return reference
+    }
+    return ''
   }
 }
