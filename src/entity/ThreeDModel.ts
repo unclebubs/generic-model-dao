@@ -82,7 +82,7 @@ class ThreeDModel extends Entity implements IThreeDModel {
   _hideFullScreenButton = false
   _hideColorsButton = false
   _exposure = 1
-  _shadowIntensity = 1
+  _shadowIntensity = 0
   _shadowSoftness = 1
   _rotationPerSecond = 50
   _cameraControls = true
